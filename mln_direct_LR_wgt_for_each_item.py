@@ -1,6 +1,6 @@
 # coding: utf-8
 
-# Copyright Zilun Peng You may use it under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. See: http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en
+# Copyright Zilun Peng 2017. You may use it under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. See: http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en
 # Some code are taken from: http://www.cs.ubc.ca/~poole/cs532/2017/as1/Gender_from_ratings_mln.py
 
 # ## Load the files.
@@ -18,12 +18,12 @@ import math, random
 with open("ml-100k/u.data", 'r') as ratingsfile:
     all_ratings = (tuple(int(e) for e in line.strip().split('\t'))
                    for line in ratingsfile)
-                   ratings = [eg for eg in all_ratings if eg[3] <= 884673930]
-                   all_users = {u for (u, i, r, d) in ratings}
-                   all_items = {i for (u, i, r, d) in ratings}
-                   print("There are ", len(ratings), "ratings and", len(all_users), "users")
-                   training_users = {u for (u, i, r, d) in ratings if d <= 880845177}
-                   test_users = all_users - training_users
+    ratings = [eg for eg in all_ratings if eg[3] <= 884673930]
+    all_users = {u for (u, i, r, d) in ratings}
+    all_items = {i for (u, i, r, d) in ratings}
+    print("There are ", len(ratings), "ratings and", len(all_users), "users")
+    training_users = {u for (u, i, r, d) in ratings if d <= 880845177}
+    test_users = all_users - training_users
 
 # extract the training and test dictionaries
 with open("ml-100k/u.user", 'r') as usersfile:
@@ -61,7 +61,7 @@ class Dataset(object):
         # tot_tr = total number of training users
         self.tot_tr = len(gender_train)
         print("Proportion of training who are female", self.nf_tr, '/', self.tot_tr, '=', self.nf_tr / self.tot_tr)
-        
+
         self.movie_stats = {}  # movie -> (#f, #m) dictionary
         for (u, i, r, d) in ratings:
             if u in gender_train:
@@ -75,22 +75,22 @@ class Dataset(object):
                     self.movie_stats[i] = (nf, nm + 1)
 
 
-# ## Evaluation
-# The following function can be used to evaluate your predictor on the test set.
-# Your predictor may use ratings and gender_train but *not* gender_test. Your predictor should take a user and a second parameter called "para" that is a parameter that can be varied.
+                    # ## Evaluation
+                    # The following function can be used to evaluate your predictor on the test set.
+                    # Your predictor may use ratings and gender_train but *not* gender_test. Your predictor should take a user and a second parameter called "para" that is a parameter that can be varied.
 
-# In[5]:
+                    # In[5]:
 
-def evaluate(self, pred, **nargs):
-    """pred is a function from users into real numbers that gives prediction P(u)='F',
+    def evaluate(self, pred, **nargs):
+        """pred is a function from users into real numbers that gives prediction P(u)='F',
         returns (sum_squares_error,  log loss)
         nargs should include para"""
-            sse = sum((pred(u, ds=self, **nargs) - (1 if g == "F" else 0)) ** 2
-                      for (u, g) in self.gender_test.items())
-                ll = -sum(math.log(prn, 2) if g == 'F' else math.log(1 - prn, 2)
-                          for (u, g) in self.gender_test.items()
-                          for prn in [pred(u, ds=self, **nargs)])
-                    return (sse, ll, sse / len(self.gender_test), ll / len(self.gender_test))
+        sse = sum((pred(u, ds=self, **nargs) - (1 if g == "F" else 0)) ** 2
+                  for (u, g) in self.gender_test.items())
+        ll = -sum(math.log(prn, 2) if g == 'F' else math.log(1 - prn, 2)
+                  for (u, g) in self.gender_test.items()
+                  for prn in [pred(u, ds=self, **nargs)])
+        return (sse, ll, sse / len(self.gender_test), ll / len(self.gender_test))
 
 
 evaluate_meaning = ["Sum Squares", "neg Log Likelihood", "Average Square Error", "Log Loss"]
@@ -157,7 +157,7 @@ def pred_mln(user, ds=original_ds, para=lambda x: 0):
         for neg_item in user_neg_ratings_stats[user]:
             prob = prob + wgts_neg_r[neg_item-1]
 
-return sigmoid(prob)
+    return sigmoid(prob)
 
 
 def learn(num_iter=20, ds=original_ds, step_size=1e-5, pregl=0, trace=True):
@@ -194,6 +194,6 @@ def learn(num_iter=20, ds=original_ds, step_size=1e-5, pregl=0, trace=True):
     print("after", iter, "iterations: evaluation=", ds.evaluate(pred_mln))
 
 
-learn(20000, trace=False)
+learn(10000, trace=False)
 # learn(10000, trace=False)
 # learn(3)
