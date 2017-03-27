@@ -127,12 +127,6 @@ def actual(rating):
 user_pos_ratings_stats = {}
 user_neg_ratings_stats = {}
 for (user, item, rating, timestamp) in ratings:
-    if user == 477:
-        temp = item
-        if user in user_pos_ratings_stats:
-            temp1 = user_pos_ratings_stats[477];
-        if user in user_neg_ratings_stats:
-            temp2 = user_neg_ratings_stats[477];
     if user in user_pos_ratings_stats and rating >= threshold:
         user_pos_ratings_stats[user].append(item)
     elif user not in user_pos_ratings_stats and rating >= threshold:
