@@ -15,7 +15,7 @@
 # In[1]:
 import math, random
 
-datasetname = "Yelp" # "100k"  # "1m"  # or "Yelp"
+datasetname = "1m" # "100k"  # "1m"  # or "Yelp"
 if datasetname=="100k":
     datafile, userfilename = "ml-100k/u.data","ml-100k/u.user"
     rating_cutoff, test_cutoff = 884673930, 880845177
@@ -170,16 +170,18 @@ user_pos_ratings_stats = {}
 user_neg_ratings_stats = {}
 for (user, item, rating, timestamp) in ratings:
     if user in user_pos_ratings_stats and rating >= threshold:
-        user_pos_ratings_stats[user].append(item)
+        np.append(user_pos_ratings_stats[user], item)
     elif user not in user_pos_ratings_stats and rating >= threshold:
-        user_pos_ratings_stats[user] = [item]
+        user_pos_ratings_stats[user] = np.array([item])
     elif user in user_neg_ratings_stats and rating < threshold:
-        user_neg_ratings_stats[user].append(item)
+        np.append(user_neg_ratings_stats[user], item)
     elif user not in user_neg_ratings_stats and rating < threshold:
-        user_neg_ratings_stats[user] = [item]
+        user_neg_ratings_stats[user] = np.array([item])
 
 wgts_posr_h = np.zeros(max(all_items))
 wgts_negr_h = np.zeros(max(all_items))
+# wgts_posr_h = np.ones(max(all_items))
+# wgts_negr_h = np.ones(max(all_items))*-1
 w0 = sigmoid_inv(original_ds.nf_tr/original_ds.tot_tr)
 wgt_h_g,wgt_nh_g = 1,-1
 iter = 0
@@ -188,11 +190,10 @@ phgr = 0
 
 def pred_mln(user, ds=original_ds, para=lambda x: 0):
     phgr = w0
-    if user in user_pos_ratings_stats:
-        for pos_item in user_pos_ratings_stats[user]:
-            phgr += wgts_posr_h[pos_item-1]
-        for neg_item in user_pos_ratings_stats[user]:
-            phgr += wgts_negr_h[neg_item-1]
+    usr_pos_item = np.array(user_pos_ratings_stats[user]) - 1 if user in user_pos_ratings_stats else []
+    usr_neg_item = np.array(user_neg_ratings_stats[user]) - 1 if user in user_neg_ratings_stats else []
+    phgr += sum(wgts_posr_h[usr_pos_item])
+    phgr += sum(wgts_negr_h[usr_neg_item])
     phgr = sigmoid(phgr)
     return sigmoid(wgt_h_g)*phgr+sigmoid(wgt_nh_g)*(1-phgr)
 
@@ -205,6 +206,8 @@ def learn(num_iter=20, ds=original_ds, step_size=1e-5, pregl=0, trace=True):
     for i in range(num_iter):
         sse, sll = 0, 0
         for user in random.sample(training_users, len(training_users)):
+            usr_pos_item = np.array(user_pos_ratings_stats[user]) - 1 if user in user_pos_ratings_stats else []
+            usr_neg_item = np.array(user_neg_ratings_stats[user]) - 1 if user in user_neg_ratings_stats else []
             predn = pred_mln(user)
             sdiff = sigmoid(wgt_h_g) - sigmoid(wgt_nh_g)
             if ds.gender_train[user] == "F":
@@ -214,12 +217,8 @@ def learn(num_iter=20, ds=original_ds, step_size=1e-5, pregl=0, trace=True):
                 wgt_h_g += step_size * phgr * sigmoid(wgt_h_g) * (1 - sigmoid(wgt_h_g)) / predn
                 wgt_nh_g += step_size * (1 - phgr) * sigmoid(wgt_nh_g) * (1 - sigmoid(wgt_nh_g)) / predn
                 w0 += step_size * sdiff * phgr * (1 - phgr) / predn
-                if user in user_pos_ratings_stats:
-                    for pos_item in user_pos_ratings_stats[user]:
-                        wgts_posr_h[pos_item-1] += step_size * sdiff * phgr * (1 - phgr) / predn
-                if user in user_neg_ratings_stats:
-                    for neg_item in user_neg_ratings_stats[user]:
-                        wgts_negr_h[neg_item - 1] += step_size * sdiff * phgr * (1 - phgr) / predn
+                wgts_posr_h[usr_pos_item] += step_size * sdiff * phgr * (1 - phgr) / predn
+                wgts_negr_h[usr_neg_item] += step_size * sdiff * phgr * (1 - phgr) / predn
             else:
                 error = predn
                 sse += error ** 2
@@ -227,16 +226,12 @@ def learn(num_iter=20, ds=original_ds, step_size=1e-5, pregl=0, trace=True):
                 wgt_h_g -= step_size * phgr * sigmoid(wgt_h_g) * (1 - sigmoid(wgt_h_g)) / (1 - predn)
                 wgt_nh_g -= step_size * (1 - phgr) * sigmoid(wgt_nh_g) * (1 - sigmoid(wgt_nh_g)) / (1 - predn)
                 w0 -= step_size * sdiff * phgr * (1 - phgr) / (1 - predn)
-                if user in user_pos_ratings_stats:
-                    for pos_item in user_pos_ratings_stats[user]:
-                        wgts_posr_h[pos_item - 1] -= step_size * sdiff * phgr * (1 - phgr) / (1 - predn)
-                if user in user_neg_ratings_stats:
-                    for neg_item in user_neg_ratings_stats[user]:
-                        wgts_negr_h[neg_item - 1] -= step_size * sdiff * phgr * (1 - phgr) / (1 - predn)
+                wgts_posr_h[usr_pos_item] -= step_size * sdiff * phgr * (1 - phgr) / (1 - predn)
+                wgts_negr_h[usr_neg_item] -= step_size * sdiff * phgr * (1 - phgr) / (1 - predn)
         iter += 1
         # if trace:
-            # print("iteration", iter, "wts for G(U)=", w0, "ase=", sse / len(ds.gender_train), "all=",
-            #       sll / len(ds.gender_train))
+        #     print("iteration", iter, "wts for G(U)=", w0, "ase=", sse / len(ds.gender_train), "all=",
+        #           sll / len(ds.gender_train))
         if prev_sll < sll:
             # step_size *= 0.5
             if trace:
@@ -249,4 +244,4 @@ def learn(num_iter=20, ds=original_ds, step_size=1e-5, pregl=0, trace=True):
     print("after", iter, "iterations: evaluation=", ds.evaluate(pred_mln))
 
 
-learn(5000, trace=True)
+learn(20, trace=True)
