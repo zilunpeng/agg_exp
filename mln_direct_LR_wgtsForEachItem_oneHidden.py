@@ -1,7 +1,7 @@
 # coding: utf-8
 
 # Copyright Zilun Peng 2017. You may use it under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. See: http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en
-# Some code are taken from: http://www.cs.ubc.ca/~poole/cs532/2017/as1/Gender_from_ratings_mln.py
+# Some code are taken from: http://www.cs.ubc.ca/~poole/cs532/2017/as1/Gender_from_ratings_mln.py and http://www.cs.ubc.ca/~poole/cs532/2017/as1/Gender_from_ratings_paper_version.py
 
 # ## Load the files.
 # To use this you need to download http://files.grouplens.org/datasets/movielens/ml-100k.zip
