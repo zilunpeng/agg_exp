@@ -170,13 +170,13 @@ user_pos_ratings_stats = {}
 user_neg_ratings_stats = {}
 for (user, item, rating, timestamp) in ratings:
     if user in user_pos_ratings_stats and rating >= threshold:
-        user_pos_ratings_stats[user].append(item)
+        np.append(user_pos_ratings_stats[user], item)
     elif user not in user_pos_ratings_stats and rating >= threshold:
-        user_pos_ratings_stats[user] = [item]
+        user_pos_ratings_stats[user] = np.array([item])
     elif user in user_neg_ratings_stats and rating < threshold:
-        user_neg_ratings_stats[user].append(item)
+        np.append(user_neg_ratings_stats[user], item)
     elif user not in user_neg_ratings_stats and rating < threshold:
-        user_neg_ratings_stats[user] = [item]
+        user_neg_ratings_stats[user] = np.array([item])
 
 wgts_pos_r = np.zeros(max(all_items))
 wgts_neg_r = np.zeros(max(all_items))
@@ -186,13 +186,10 @@ iter = 0
 
 def pred_mln(user, ds=original_ds, para=lambda x: 0):
     prob = w0;
-    if user in user_pos_ratings_stats:
-        for pos_item in user_pos_ratings_stats[user]:
-            prob = prob + wgts_pos_r[pos_item-1]
-    if user in user_neg_ratings_stats:
-        for neg_item in user_neg_ratings_stats[user]:
-            prob = prob + wgts_neg_r[neg_item-1]
-
+    usr_pos_item = np.array(user_pos_ratings_stats[user]) - 1 if user in user_pos_ratings_stats else []
+    usr_neg_item = np.array(user_neg_ratings_stats[user]) - 1 if user in user_neg_ratings_stats else []
+    prob += sum(wgts_pos_r[usr_pos_item])
+    prob += sum(wgts_neg_r[usr_neg_item])
     return sigmoid(prob)
 
 
@@ -205,16 +202,14 @@ def learn(num_iter=20, ds=original_ds, step_size=1e-5, pregl=0, trace=True):
         sse, sll = 0, 0
         # old_weights = w0, w1, w2
         for user in random.sample(training_users, len(training_users)):
+            usr_pos_item = np.array(user_pos_ratings_stats[user]) - 1 if user in user_pos_ratings_stats else []
+            usr_neg_item = np.array(user_neg_ratings_stats[user]) - 1 if user in user_neg_ratings_stats else []
             error = pred_mln(user) - (1 if ds.gender_train[user] == "F" else 0)
             sse += error ** 2
             sll += -math.log(pred_mln(user) if ds.gender_train[user] == "F" else 1 - pred_mln(user), 2)
             w0 -= step_size * error
-            if user in user_pos_ratings_stats:
-                for pos_item in user_pos_ratings_stats[user]:
-                    wgts_pos_r[pos_item-1] -= step_size * error
-            if user in user_neg_ratings_stats:
-                for neg_item in user_neg_ratings_stats[user]:
-                    wgts_neg_r[neg_item-1] -= step_size * error
+            wgts_pos_r[usr_pos_item] -= step_size * error
+            wgts_neg_r[usr_neg_item] -= step_size * error
         w0 = w0 * (1 - pregl)
         wgts_neg_r = wgts_neg_r * (1 - pregl)
         wgts_pos_r = wgts_pos_r * (1 - pregl)
@@ -230,6 +225,6 @@ def learn(num_iter=20, ds=original_ds, step_size=1e-5, pregl=0, trace=True):
     print("after", iter, "iterations: evaluation=", ds.evaluate(pred_mln))
 
 
-learn(10, trace=True)
+learn(20, trace=True)
 # learn(10000, trace=False)
 # learn(3)
