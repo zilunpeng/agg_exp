@@ -15,7 +15,7 @@
 # In[1]:
 import math, random
 
-datasetname = "Yelp" # "100k"  # "1m"  # or "Yelp"
+datasetname = "100k" # "100k"  # "1m"  # or "Yelp"
 if datasetname=="100k":
     datafile, userfilename = "ml-100k/u.data","ml-100k/u.user"
     rating_cutoff, test_cutoff = 884673930, 880845177
@@ -186,10 +186,12 @@ iter = 0
 
 def pred_mln(user, ds=original_ds, para=lambda x: 0):
     prob = w0;
-    usr_pos_item = np.array(user_pos_ratings_stats[user]) - 1 if user in user_pos_ratings_stats else []
-    usr_neg_item = np.array(user_neg_ratings_stats[user]) - 1 if user in user_neg_ratings_stats else []
-    prob += sum(wgts_pos_r[usr_pos_item])
-    prob += sum(wgts_neg_r[usr_neg_item])
+    if user in user_pos_ratings_stats:
+        usr_pos_item = np.array(user_pos_ratings_stats[user]) - 1
+        prob += sum(wgts_pos_r[usr_pos_item])
+    if user in user_neg_ratings_stats:
+        usr_neg_item = np.array(user_neg_ratings_stats[user]) - 1
+        prob += sum(wgts_neg_r[usr_neg_item])
     return sigmoid(prob)
 
 
@@ -202,14 +204,16 @@ def learn(num_iter=20, ds=original_ds, step_size=1e-5, pregl=0, trace=True):
         sse, sll = 0, 0
         # old_weights = w0, w1, w2
         for user in random.sample(training_users, len(training_users)):
-            usr_pos_item = np.array(user_pos_ratings_stats[user]) - 1 if user in user_pos_ratings_stats else []
-            usr_neg_item = np.array(user_neg_ratings_stats[user]) - 1 if user in user_neg_ratings_stats else []
             error = pred_mln(user) - (1 if ds.gender_train[user] == "F" else 0)
             sse += error ** 2
             sll += -math.log(pred_mln(user) if ds.gender_train[user] == "F" else 1 - pred_mln(user), 2)
             w0 -= step_size * error
-            wgts_pos_r[usr_pos_item] -= step_size * error
-            wgts_neg_r[usr_neg_item] -= step_size * error
+            if user in user_pos_ratings_stats:
+                usr_pos_item = np.array(user_pos_ratings_stats[user]) - 1
+                wgts_pos_r[usr_pos_item] -= step_size * error
+            if user in user_neg_ratings_stats:
+                usr_neg_item = np.array(user_neg_ratings_stats[user]) - 1
+                wgts_neg_r[usr_neg_item] -= step_size * error
         w0 = w0 * (1 - pregl)
         wgts_neg_r = wgts_neg_r * (1 - pregl)
         wgts_pos_r = wgts_pos_r * (1 - pregl)
@@ -225,6 +229,6 @@ def learn(num_iter=20, ds=original_ds, step_size=1e-5, pregl=0, trace=True):
     print("after", iter, "iterations: evaluation=", ds.evaluate(pred_mln))
 
 
-learn(20, trace=True)
+learn(10000, trace=False)
 # learn(10000, trace=False)
 # learn(3)
