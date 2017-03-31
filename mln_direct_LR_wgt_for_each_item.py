@@ -15,7 +15,7 @@
 # In[1]:
 import math, random
 
-datasetname = "100k" # "100k"  # "1m"  # or "Yelp"
+datasetname = "Yelp" # "100k"  # "1m"  # or "Yelp"
 if datasetname=="100k":
     datafile, userfilename = "ml-100k/u.data","ml-100k/u.user"
     rating_cutoff, test_cutoff = 884673930, 880845177
@@ -37,11 +37,11 @@ with open(datafile,'r') as ratingsfile:
                        for (user,rest,rating) in [tuple(line.strip().split(','))]   # for yelp
                              ]
         with open(usertrainfilename) as usertrainfile:
-            gender_train = {rest:"F" if eth=="Mexican" else "M" for line in usertrainfile
+            gender_train = {int(rest[1:]):"F" if eth=="Mexican" else "M" for line in usertrainfile
                                 for (rest,eth) in [tuple(line.strip().split(','))]
                                 }
         with open(usertestfilename) as usertestfile:
-            gender_test = {rest:"F" if eth=="Mexican" else "M" for line in usertestfile
+            gender_test = {int(rest[1:]):"F" if eth=="Mexican" else "M" for line in usertestfile
                                for (rest,eth) in [tuple(line.strip().split(','))]
                                 }
         training_users = set(gender_train)
@@ -170,13 +170,13 @@ user_pos_ratings_stats = {}
 user_neg_ratings_stats = {}
 for (user, item, rating, timestamp) in ratings:
     if user in user_pos_ratings_stats and rating >= threshold:
-        np.append(user_pos_ratings_stats[user], item)
+        user_pos_ratings_stats[user] = np.append(user_pos_ratings_stats[user], item)
     elif user not in user_pos_ratings_stats and rating >= threshold:
-        user_pos_ratings_stats[user] = np.array([item])
+        user_pos_ratings_stats[user] = user_pos_ratings_stats[user] = np.array([item])
     elif user in user_neg_ratings_stats and rating < threshold:
-        np.append(user_neg_ratings_stats[user], item)
+        user_neg_ratings_stats[user] = np.append(user_neg_ratings_stats[user], item)
     elif user not in user_neg_ratings_stats and rating < threshold:
-        user_neg_ratings_stats[user] = np.array([item])
+        user_neg_ratings_stats[user] = user_neg_ratings_stats[user] = np.array([item])
 
 wgts_pos_r = np.zeros(max(all_items))
 wgts_neg_r = np.zeros(max(all_items))
@@ -187,11 +187,9 @@ iter = 0
 def pred_mln(user, ds=original_ds, para=lambda x: 0):
     prob = w0;
     if user in user_pos_ratings_stats:
-        usr_pos_item = np.array(user_pos_ratings_stats[user]) - 1
-        prob += sum(wgts_pos_r[usr_pos_item])
+        prob += sum(wgts_pos_r[user_pos_ratings_stats[user] - 1])
     if user in user_neg_ratings_stats:
-        usr_neg_item = np.array(user_neg_ratings_stats[user]) - 1
-        prob += sum(wgts_neg_r[usr_neg_item])
+        prob += sum(wgts_neg_r[user_neg_ratings_stats[user] - 1])
     return sigmoid(prob)
 
 
@@ -209,14 +207,9 @@ def learn(num_iter=20, ds=original_ds, step_size=1e-5, pregl=0, trace=True):
             sll += -math.log(pred_mln(user) if ds.gender_train[user] == "F" else 1 - pred_mln(user), 2)
             w0 -= step_size * error
             if user in user_pos_ratings_stats:
-                usr_pos_item = np.array(user_pos_ratings_stats[user]) - 1
-                wgts_pos_r[usr_pos_item] -= step_size * error
+                wgts_pos_r[user_pos_ratings_stats[user] - 1] -= step_size * error;
             if user in user_neg_ratings_stats:
-                usr_neg_item = np.array(user_neg_ratings_stats[user]) - 1
-                wgts_neg_r[usr_neg_item] -= step_size * error
-        w0 = w0 * (1 - pregl)
-        wgts_neg_r = wgts_neg_r * (1 - pregl)
-        wgts_pos_r = wgts_pos_r * (1 - pregl)
+                wgts_neg_r[user_neg_ratings_stats[user] - 1] -= step_size * error;
         iter += 1
         if trace:
             print("iteration", iter, "wts for G(U)=", w0, "ase=", sse / len(ds.gender_train), "all=",
@@ -229,6 +222,6 @@ def learn(num_iter=20, ds=original_ds, step_size=1e-5, pregl=0, trace=True):
     print("after", iter, "iterations: evaluation=", ds.evaluate(pred_mln))
 
 
-learn(100000, trace=False)
+learn(20000, trace=False)
 # learn(10000, trace=False)
 # learn(3)
