@@ -230,6 +230,6 @@ def learn(num_iter=20, ds=original_ds, step_size=1e-5, pregl=0, trace=True):
     print("after", iter, "iterations: evaluation=", ds.evaluate(pred_mln))
 
 
-learn(10, trace=True)
+learn(100000, trace=False)
 # learn(10000, trace=False)
 # learn(3)
