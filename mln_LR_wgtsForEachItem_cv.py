@@ -280,7 +280,7 @@ def cross_val(pred):
         fold_min = find_min(mln_learn,ds,1000, 500)
         print("fold_min =",fold_min,"for ds=",ds.name)
         sum += fold_min
-    return sum/k
+    return int(round(sum/k))
 
 opt_para = cross_val(mln_learn)
 print('testing error by setting number of iterations to',opt_para,'(learned from CV)',mln_learn(num_iter=opt_para, ds=original_ds))
