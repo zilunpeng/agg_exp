@@ -34,17 +34,23 @@ with open("ml-100k/u.user", 'r') as usersfile:
             gender_train[int(u)] = g
         elif int(u) in test_users:
             gender_test[int(u)] = g
+    print("There are ", len(gender_train.keys()), "training users and", len(gender_test.keys()), "testing users")
 
-with open("./tuffy_exp/mln-evidence.db", "w+") as mln_evi:
+with open("./tuffy_exp/mln_evidence.db", "w+") as mln_evi:
     for (u, i, r, d) in ratings:
         if  r >= 4:
-            mln_evi.write("RatedGt(U"+u+",I"+i+")\n")
+            mln_evi.write("RatedGt(U"+str(u)+",I"+str(i)+")\n")
         if r < 4:
-            mln_evi.write("RatedLt(U"+u+",I"+i+")\n")
-    for u, g in gender_train:
+            mln_evi.write("RatedLt(U"+str(u)+",I"+str(i)+")\n")
+    for u, g in gender_train.items():
         if g == 'F':
-            mln_evi.write("Gender(U" + u + ")\n")
+            mln_evi.write("Gender(U" + str(u) + ")\n")
+        if g == 'M':
+            mln_evi.write("!Gender(U" + str(u) + ")\n")
 
-with open("./tuffy_exp/mln-query.db", "w+") as mln_que:
-    for u, g in gender_test:
-        mln_que.write("Gender(U" + u + ")\n")
+with open("./tuffy_exp/mln_query.db", "w+") as mln_que:
+    for u, g in gender_test.items():
+        mln_que.write("Gender(U" + str(u) + ")\n")
+
+mln_evi.close()
+mln_que.close()
