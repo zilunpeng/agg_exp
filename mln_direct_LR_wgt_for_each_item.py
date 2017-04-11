@@ -222,6 +222,6 @@ def learn(num_iter=20, ds=original_ds, step_size=1e-5, pregl=0, trace=True):
     print("after", iter, "iterations: evaluation=", ds.evaluate(pred_mln))
 
 
-learn(20000, trace=False)
+learn(50000, trace=False)
 # learn(10000, trace=False)
 # learn(3)

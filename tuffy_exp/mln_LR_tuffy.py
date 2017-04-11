@@ -38,19 +38,19 @@ with open("ml-100k/u.user", 'r') as usersfile:
 
 with open("./tuffy_exp/mln_evidence.db", "w+") as mln_evi:
     for (u, i, r, d) in ratings:
-        if  r >= 4:
-            mln_evi.write("RatedGt(U"+str(u)+",I"+str(i)+")\n")
-        if r < 4:
-            mln_evi.write("RatedLt(U"+str(u)+",I"+str(i)+")\n")
+        if  r >= 4 and u in gender_train:
+            mln_evi.write("ratedGt(U"+str(u)+",I"+str(i)+")\n")
+        if r < 4 and u in gender_train:
+            mln_evi.write("ratedLt(U"+str(u)+",I"+str(i)+")\n")
     for u, g in gender_train.items():
         if g == 'F':
-            mln_evi.write("Gender(U" + str(u) + ")\n")
+            mln_evi.write("gender(U" + str(u) + ")\n")
         if g == 'M':
-            mln_evi.write("!Gender(U" + str(u) + ")\n")
+            mln_evi.write("!gender(U" + str(u) + ")\n")
 
-with open("./tuffy_exp/mln_query.db", "w+") as mln_que:
-    for u, g in gender_test.items():
-        mln_que.write("Gender(U" + str(u) + ")\n")
+# with open("./tuffy_exp/mln_query.db", "w+") as mln_que:
+#     for u, g in gender_test.items():
+#         mln_que.write("gender(U" + str(u) + ")\n")
 
 mln_evi.close()
-mln_que.close()
+# mln_que.close()
