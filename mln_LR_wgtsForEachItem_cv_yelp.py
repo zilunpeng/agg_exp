@@ -33,7 +33,7 @@ def extract_cols(lst,indexes):
 
 with open(datafile,'r') as ratingsfile:
     if datasetname == "Yelp":
-        ratings = [(int(user[1:]),int(rest[1:]),int(rating),99999) for line in ratingsfile
+        ratings = [(int(rest[1:]), int(user[1:]), int(rating), 99999) for line in ratingsfile
                        for (user,rest,rating) in [tuple(line.strip().split(','))]   # for yelp
                              ]
         with open(usertrainfilename) as usertrainfile:
