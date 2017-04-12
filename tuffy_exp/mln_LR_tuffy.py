@@ -48,9 +48,5 @@ with open("./tuffy_exp/mln_evidence.db", "w+") as mln_evi:
         if g == 'M':
             mln_evi.write("!gender(U" + str(u) + ")\n")
 
-# with open("./tuffy_exp/mln_query.db", "w+") as mln_que:
-#     for u, g in gender_test.items():
-#         mln_que.write("gender(U" + str(u) + ")\n")
-
 mln_evi.close()
 # mln_que.close()
