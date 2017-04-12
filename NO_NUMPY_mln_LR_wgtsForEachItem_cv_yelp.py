@@ -185,9 +185,11 @@ iter = 0
 def pred_mln(user, ds=original_ds, para=lambda x: 0):
     prob = w0;
     if user in user_pos_ratings_stats:
-        prob += sum(wgts_pos_r[user_pos_ratings_stats[user] - 1])
+        for pos_item in user_pos_ratings_stats[user]:
+            prob += wgts_pos_r[pos_item - 1]
     if user in user_neg_ratings_stats:
-        prob += sum(wgts_neg_r[user_neg_ratings_stats[user] - 1])
+        for neg_item in user_neg_ratings_stats[user]:
+            prob += wgts_neg_r[neg_item - 1]
     return sigmoid(prob)
 
 
