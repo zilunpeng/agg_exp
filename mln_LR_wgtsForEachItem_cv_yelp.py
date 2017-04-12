@@ -277,7 +277,7 @@ def cross_val(pred):
     returns the average of the parameter setting"""
     sum=0
     for ds in folds:
-        fold_min = find_min(mln_learn,ds,1000, 500)
+        fold_min = find_min(mln_learn,ds,1000, 1000)
         print("fold_min =",fold_min,"for ds=",ds.name)
         sum += fold_min
     return int(round(sum/k))
