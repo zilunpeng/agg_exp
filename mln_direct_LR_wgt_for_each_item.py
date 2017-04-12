@@ -222,6 +222,11 @@ def learn(num_iter=20, ds=original_ds, step_size=1e-5, pregl=0, trace=True):
     print("after", iter, "iterations: evaluation=", ds.evaluate(pred_mln))
 
 
-learn(10000, trace=False)
-# learn(10000, trace=False)
-# learn(3)
+learn(60000, trace=False)
+
+import os
+def notify(title, text):
+    os.system("""
+              osascript -e 'display notification "{}" with title "{}"'
+              """.format(text, title))
+notify("mln_direct_LR", "program is finished")
