@@ -37,11 +37,11 @@ with open(datafile,'r') as ratingsfile:
                        for (user,rest,rating) in [tuple(line.strip().split(','))]   # for yelp
                              ]
         with open(usertrainfilename) as usertrainfile:
-            gender_train = {rest:"F" if eth=="Mexican" else "M" for line in usertrainfile
+            gender_train = {int(rest[1:]): "F" if eth == "Mexican" else "M" for line in usertrainfile
                                 for (rest,eth) in [tuple(line.strip().split(','))]
                                 }
         with open(usertestfilename) as usertestfile:
-            gender_test = {rest:"F" if eth=="Mexican" else "M" for line in usertestfile
+            gender_test = {int(rest[1:]): "F" if eth == "Mexican" else "M" for line in usertestfile
                                for (rest,eth) in [tuple(line.strip().split(','))]
                                 }
         training_users = set(gender_train)
