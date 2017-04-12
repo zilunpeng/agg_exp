@@ -210,9 +210,11 @@ def mln_learn(num_iter=20, ds=original_ds, step_size=1e-5, pregl=0, trace=False)
             sll += -math.log(pred_mln(user) if ds.gender_train[user] == "F" else 1 - pred_mln(user), 2)
             w0 -= step_size * error
             if user in user_pos_ratings_stats:
-                wgts_pos_r[user_pos_ratings_stats[user] - 1] -= step_size * error;
+                for pos_item in user_pos_ratings_stats[user]:
+                    wgts_pos_r[pos_item - 1] -= step_size * error;
             if user in user_neg_ratings_stats:
-                wgts_neg_r[user_neg_ratings_stats[user] - 1] -= step_size * error;
+                for neg_item in user_neg_ratings_stats[user]:
+                    wgts_neg_r[neg_item - 1] -= step_size * error;
         iter += 1
         if trace:
             print("iteration", iter, "wts for G(U)=", w0, "ase=", sse / len(ds.gender_train), "all=",
