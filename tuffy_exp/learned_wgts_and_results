@@ -1,5 +1,5 @@
 # 1m dataset
-
+ 
 weights:
 0.4459        gender(v0)  //1.0
 0.0164       !ratedGt(v0, v1)  v  gender(v0)  //2.0
