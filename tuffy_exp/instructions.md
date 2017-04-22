@@ -7,8 +7,10 @@
 
 3. Run mln_LR_tuffy_test.py to generate evidence and test files for inference
 
+4. Run Tuffy for inference
+
         command for inference:
         java -jar tuffy.jar -marginal -i learnedWgtsMln.mln -e mln_evidence.db -queryFile mln_query.db -r results.txt
 
 
-4. Run mln_LR_tuffy_evalutate.py to generate the errors on results.txt
+5. Run mln_LR_tuffy_evalutate.py to generate the errors on results.txt
