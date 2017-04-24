@@ -149,7 +149,6 @@ def pred_mln(user, ds=original_ds, para=lambda x: 0):
     if  user in tuffy_result:
         return tuffy_result[user]
     else:
-        return 0.5
-        # assert False, ("test user is not in Tuffy's query file")
+        assert False, ("test user is not in Tuffy's query file")
 
 print("tuffy result on ",datasetname," is", original_ds.evaluate(pred_mln))
