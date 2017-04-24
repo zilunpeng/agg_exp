@@ -1,0 +1,7 @@
+*ratedGt(person,movie)
+*ratedLt(person,movie)
+gender(person)
+
+1 gender(p)
+1 !ratedGt(p,m) v gender(p)
+1 !ratedLt(p,m) v gender(p)
