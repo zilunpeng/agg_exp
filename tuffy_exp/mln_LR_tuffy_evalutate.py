@@ -141,7 +141,7 @@ class Dataset(object):
                 else:
                     ll += math.log(1 - prn, 2)
 
-        return (sse, ll, sse / len(self.gender_test), ll / len(self.gender_test))
+        return (sse, -ll, sse / len(self.gender_test), -ll / len(self.gender_test))
 
 original_ds = Dataset("all", gender_train, gender_test)
 
