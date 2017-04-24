@@ -14,7 +14,7 @@
 
 # In[1]:
 import math
-datasetname = "1m" # "100k"  # "1m"  # or "Yelp"
+datasetname = "Yelp" # "100k"  # "1m"  # or "Yelp"
 if datasetname=="100k":
     datafile, userfilename = "ml-100k/u.data","ml-100k/u.user"
     rating_cutoff, test_cutoff = 884673930, 880845177
@@ -130,7 +130,10 @@ class Dataset(object):
         ll = 0
         for (u, g) in self.gender_test.items():
             for prn in [pred(u, ds=self, **nargs)]:
-                if g == 'F':
+                if g == 'F' and prn == 0:
+                    ll = math.inf
+                    break
+                elif g == 'F':
                     ll += math.log(prn, 2)
                 elif g == 'M' and prn == 1:
                     ll = math.inf
@@ -146,6 +149,7 @@ def pred_mln(user, ds=original_ds, para=lambda x: 0):
     if  user in tuffy_result:
         return tuffy_result[user]
     else:
-        assert False, ("test user is not in Tuffy's query file")
+        return 0.5
+        # assert False, ("test user is not in Tuffy's query file")
 
 print("tuffy result on ",datasetname," is", original_ds.evaluate(pred_mln))
