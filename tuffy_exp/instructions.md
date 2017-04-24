@@ -1,7 +1,16 @@
-command for weight learning:
+1. Run mln_LR_tuffy_wgt_train.py to generate evidence and test files for weight learning
 
-java -jar tuffy.jar -learnwt -i prog.mln -e mln_evidence.db -queryFile mln_query.db -r learnedWgtsMln.mln -mcsatSamples 5 -dMaxIter 5000
+2. Run Tuffy to learn weight
 
-command for inference:
+        command for weight learning:
+        java -jar tuffy.jar -learnwt -i prog.mln -e mln_evidence.db -queryFile mln_query.db -r learnedWgtsMln.mln -mcsatSamples 5 -dMaxIter 5000
 
-java -jar tuffy.jar -marginal -i learnedWgtsMln.mln -e mln_evidence.db -queryFile mln_query.db -r results.txt
+3. Run mln_LR_tuffy_test.py to generate evidence and test files for inference
+
+4. Run Tuffy for inference
+
+        command for inference:
+        java -jar tuffy.jar -marginal -i learnedWgtsMln.mln -e mln_evidence.db -queryFile mln_query.db -r results.txt
+
+
+5. Run mln_LR_tuffy_evalutate.py to generate the errors on results.txt
