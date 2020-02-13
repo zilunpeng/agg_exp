@@ -47,11 +47,15 @@ Here is the empirical results of other baselines:
   <img src="images/table.png">
 </p>
 
-This result is from Table 2 in [Kazemi et al 2017]. ml-60k and ml-1m are movie ratings datasets. In the Yelp dataset, we predict a restaurant's cuisine type given user's ratings. 
+This result is from Table 2 in [Kazemi et al 2017]. ml-60k and ml-1m are movie rating datasets. In the Yelp dataset, we predict a restaurant's cuisine type given user's ratings. 
 
-It's hard to explain why the second MLN (weight per movie) has better performances than methods like matrix factorization in the above table. But it is clear that the second MLN has a better performance than the first naive MLN (with results in the third row of the above table), and this could be explained by the better aggregating ability of the second MLN.  
+It's hard to explain why the second MLN (weight per movie) has better performances than methods like matrix factorization in the above table. But it is clear that the second MLN has a better performance than the first naive MLN (with results shown in the third row of the above table), and this could be explained by the better aggregating ability of the second MLN.  
+
 
 ### References
 [Kazemi et al 2017] Comparing aggregators for relational probabilistic models. arXiv preprint arXiv:1707.07785
 
 [Domingos and Lowd 2009] Markov Logic: An Interface Layer for Artificial Intelligence. Synthesis Lectures on Artificial Intelligence and Machine Learning, Morgan and Claypool.
+
+### Acknowledgement
+I want to thank Mehran Kazemi, Bahare Fatemi, Alexandra Kim, Moumita Roy Tora, Xing Zeng, Matthew Dirks, David Poole for discussions and guidances on this project! 
